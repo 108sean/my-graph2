@@ -216,3 +216,37 @@ with st.container():
     st.write(
         "개봉일 스크린수와 총 관객수 외에도 버블 크기를 통해 개봉 첫 주 초반 흥행 동력(초반 집객력)이 최종 관객수에 얼마나 영향을 미쳤는지 종합적으로 파악할 수 있습니다."
     )
+
+st.write("")  # 여백 추가
+
+# ----------------------------------------------------
+# 7. 제작 국가 및 장르별 영화 편수 선버스트 그래프
+# ----------------------------------------------------
+st.subheader("7. 제작 국가 및 장르별 영화 편수 분포 (선버스트)")
+
+# 제작 국가 -> 장르 계층 집계
+df_sunburst = (
+    df.groupby(["nation", "main_genre"], as_index=False)
+    .size()
+    .rename(columns={"size": "count"})
+)
+
+fig7 = px.sunburst(
+    df_sunburst,
+    path=["nation", "main_genre"],  # 제작 국가 -> 장르
+    values="count",  # 칸 크기: 영화 편수
+    title="제작 국가 및 장르별 영화 편수 계층 구조",
+    color="nation",
+)
+
+fig7.update_traces(
+    hovertemplate="<b>%{label}</b><br>영화 편수: %{value}편<br>비율: %{percentParent:.1%}"
+)
+
+st.plotly_chart(fig7, use_container_width=True)
+
+with st.container():
+    st.markdown("### 💡 이 그래프로 알 수 있는 것")
+    st.write(
+        "주요 제작 국가별 전체 영화 수 비중과 함께, 각 국가 내부에서 주로 제작·공급되는 주요 장르 구성을 동심원 구조로 쉽게 알 수 있습니다."
+    )
