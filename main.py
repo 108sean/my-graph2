@@ -146,3 +146,38 @@ with st.container():
     st.write(
         "개봉일 스크린수가 많을수록 대체로 총 관객수도 증가하는 양의 상관관계를 보이지만, 스크린수 대비 폭발적인 관객수를 기록한 흥행 상위 영화들도 확인할 수 있습니다."
     )
+
+st.write("")  # 여백 추가
+
+# ----------------------------------------------------
+# 5. 주요 장르별 총 관객수 상자 그림 (박스플롯)
+# ----------------------------------------------------
+st.subheader("5. 주요 장르별 총 관객수 분포 (박스플롯)")
+
+# 영화가 10편 이상인 장르만 추출
+genre_counts_series = df["main_genre"].value_counts()
+major_genres = genre_counts_series[genre_counts_series >= 10].index
+df_major_genres = df[df["main_genre"].isin(major_genres)]
+
+fig5 = px.box(
+    df_major_genres,
+    x="main_genre",
+    y="total_audi",
+    color="main_genre",
+    points="outliers",  # 이상치 점 표시
+    hover_name="movieNm",  # 이상치/점 마우스오버 시 영화명 표시
+    title="주요 장르별(10편 이상) 총 관객수 박스플롯",
+    labels={"main_genre": "장르", "total_audi": "총 관객수"},
+)
+
+fig5.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>총 관객수: %{y:,}명"
+)
+
+st.plotly_chart(fig5, use_container_width=True)
+
+with st.container():
+    st.markdown("### 💡 이 그래프로 알 수 있는 것")
+    st.write(
+        "주요 장르 간 중앙값의 차이와 흥행 편차를 비교할 수 있으며, 일반적인 범위(상자 내부)를 크게 벗어나 기록적인 관객수를 달성한 흥행 이상치(Outlier) 영화를 식별할 수 있습니다."
+    )
