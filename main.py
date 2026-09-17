@@ -13,8 +13,8 @@ def load_data():
     url = "https://raw.githubusercontent.com/greatsong/modudata/main/data/kobis_movies.csv"
     df = pd.read_csv(url)
 
-    # 장르 전처리: 세로막대 기호(|)로 여러 개 적힌 경우 첫 번째 장르만 추출
-    df["main_genre"] = df["genre"].astype(str).apply(lambda x: x.split("|")[0])
+    # 장르 전처리: .str.split()을 사용하여 첫 번째 장르만 안전하게 추출
+    df["main_genre"] = df["genre"].astype(str).str.split("|").str[0]
     return df
 
 
@@ -37,7 +37,9 @@ fig = px.pie(
 )
 
 # 마우스오버 시 편수와 비율이 함께 표시되도록 설정
-fig.update_traces(hovertemplate="<b>%{label}</b><br>편수: %{value}편<br>비율: %{percent}")
+fig.update_traces(
+    hovertemplate="<b>%{label}</b><br>편수: %{value}편<br>비율: %{percent}"
+)
 
 st.plotly_chart(fig, use_container_width=True)
 
@@ -47,5 +49,5 @@ st.divider()
 with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
-        "박스오피스 상위권 영화 중 특정 장르(예: 드라마다 드라마/액션 등)의 비중이 얼마나 큰지 한눈에 파악할 수 있으며, 시장에서 인기 있는 주요 장르 분포를 알 수 있습니다."
+        "박스오피스 상위권 영화 중 특정 장르의 비중이 얼마나 큰지 한눈에 파악할 수 있으며, 시장에서 인기 있는 주요 장르 분포를 알 수 있습니다."
     )
