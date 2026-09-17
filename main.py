@@ -59,15 +59,23 @@ st.write("")  # 여백 추가
 # ----------------------------------------------------
 st.subheader("2. 장르 및 영화별 총 관객수 분포 (트리맵)")
 
+# 중복 방지를 위한 영화코드(movieCd) 기준 그룹화 및 aggregation
+df_tree = (
+    df.groupby(["main_genre", "movieCd", "movieNm"], as_index=False)[
+        "total_audi"
+    ]
+    .sum()
+)
+
 fig2 = px.treemap(
-    df,
+    df_tree,
     path=["main_genre", "movieNm"],  # 장르 -> 영화명 계층 구조
     values="total_audi",  # 칸 크기: 총 관객수
     title="장르별 영화 및 총 관객수 분포",
     color="main_genre",  # 장르별 색상 구분
 )
 
-# 마우스오버 시 영화명/장르 및 총 관객수가 쉼표로 포맷팅되어 표시되도록 설정
+# 마우스오버 시 영화명 및 총 관객수가 쉼표로 포맷팅되어 표시되도록 설정
 fig2.update_traces(
     hovertemplate="<b>%{label}</b><br>총 관객수: %{value:,}명"
 )
