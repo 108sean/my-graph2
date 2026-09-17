@@ -146,7 +146,3 @@ with st.container():
     st.write(
         "개봉일 스크린수가 많을수록 대체로 총 관객수도 증가하는 양의 상관관계를 보이지만, 스크린수 대비 폭발적인 관객수를 기록한 흥행 상위 영화들도 확인할 수 있습니다."
     )
-```<ElicitationsGroup message="추가로 구성할 기능이나 그래프가 있으신가요?">
-  <Elicitation label="사이드바 필터(장르, 국가 선택) 구현하기" query="main.py에 사이드바를 추가해서 장르와 제작 국가를 필터링할 수 있도록 고쳐 줘."/>
-  <Elicitation label="다섯 번째 그래프(상영횟수 vs 총관객 수) 추가하기" query="main.py에 first_show(개봉일 상영횟수)와 total_audi(총 관객수)의 관계를 보여주는 다섯 번째 그래프를 추가해 줘."/>
-</ElicitationsGroup>
