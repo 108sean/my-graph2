@@ -25,7 +25,6 @@ df = load_data()
 # ----------------------------------------------------
 st.subheader("1. 장르별 영화 편수 분포")
 
-# 장르별 편수 집계
 genre_counts = df["main_genre"].value_counts().reset_index()
 genre_counts.columns = ["장르", "편수"]
 
@@ -38,14 +37,12 @@ fig1 = px.pie(
     title="장르별 영화 편수 비율",
 )
 
-# 마우스오버 시 편수와 비율이 함께 표시되도록 설정
 fig1.update_traces(
     hovertemplate="<b>%{label}</b><br>편수: %{value}편<br>비율: %{percent}"
 )
 
 st.plotly_chart(fig1, use_container_width=True)
 
-# 1번 그래프 설명 구역
 with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
@@ -59,32 +56,62 @@ st.write("")  # 여백 추가
 # ----------------------------------------------------
 st.subheader("2. 장르 및 영화별 총 관객수 분포 (트리맵)")
 
-# 중복 방지를 위한 영화코드(movieCd) 기준 그룹화 및 aggregation
 df_tree = (
     df.groupby(["main_genre", "movieCd", "movieNm"], as_index=False)[
         "total_audi"
-    ]
-    .sum()
+    ].sum()
 )
 
 fig2 = px.treemap(
     df_tree,
-    path=["main_genre", "movieNm"],  # 장르 -> 영화명 계층 구조
-    values="total_audi",  # 칸 크기: 총 관객수
+    path=["main_genre", "movieNm"],
+    values="total_audi",
     title="장르별 영화 및 총 관객수 분포",
-    color="main_genre",  # 장르별 색상 구분
+    color="main_genre",
 )
 
-# 마우스오버 시 영화명 및 총 관객수가 쉼표로 포맷팅되어 표시되도록 설정
 fig2.update_traces(
     hovertemplate="<b>%{label}</b><br>총 관객수: %{value:,}명"
 )
 
 st.plotly_chart(fig2, use_container_width=True)
 
-# 2번 그래프 설명 구역
 with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
         "장르 전체의 관객 규모뿐만 아니라, 특정 장르 내에서 어떤 영화가 흥행을 주도했는지(관객수 비중) 직관적으로 알 수 있습니다."
+    )
+
+st.write("")  # 여백 추가
+
+# ----------------------------------------------------
+# 3. 총 관객수 히스토그램
+# ----------------------------------------------------
+st.subheader("3. 총 관객수 분포 (히스토그램)")
+
+fig3 = px.histogram(
+    df,
+    x="total_audi",
+    nbins=30,
+    title="총 관객수 구간별 영화 수 분포",
+    labels={"total_audi": "총 관객수"},
+)
+
+fig3.update_traces(
+    hovertemplate="관객수 구간: %{x}<br>영화 수: %{y}편"
+)
+
+st.plotly_chart(fig3, use_container_width=True)
+
+# 가장 관객수가 많은 영화 정보 계산
+top_movie = df.loc[df["total_audi"].idxmax()]
+top_title = top_movie["movieNm"]
+top_audi = top_movie["total_audi"]
+
+# 3번 그래프 설명 구역
+with st.container():
+    st.markdown("### 💡 이 그래프로 알 수 있는 것")
+    st.write(
+        f"대부분의 영화가 총 관객수 **100만 명 미만~200만 명 이하**의 하위 구간에 모여 있는 비대칭적 분포를 보이며, "
+        f"가장 관객이 많은 영화는 **'{top_title}'**(약 {top_audi:,}명)입니다."
     )
