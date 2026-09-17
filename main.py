@@ -43,9 +43,7 @@ fig.update_traces(
 
 st.plotly_chart(fig, use_container_width=True)
 
-st.divider()
-
-# 그래프 아래 설명 구역
+# 그래프 아래 설명 구역 (st.divider() 제거됨)
 with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
