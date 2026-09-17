@@ -154,7 +154,6 @@ st.write("")  # 여백 추가
 # ----------------------------------------------------
 st.subheader("5. 주요 장르별 총 관객수 분포 (박스플롯)")
 
-# 영화가 10편 이상인 장르만 추출
 genre_counts_series = df["main_genre"].value_counts()
 major_genres = genre_counts_series[genre_counts_series >= 10].index
 df_major_genres = df[df["main_genre"].isin(major_genres)]
@@ -164,8 +163,8 @@ fig5 = px.box(
     x="main_genre",
     y="total_audi",
     color="main_genre",
-    points="outliers",  # 이상치 점 표시
-    hover_name="movieNm",  # 이상치/점 마우스오버 시 영화명 표시
+    points="outliers",
+    hover_name="movieNm",
     title="주요 장르별(10편 이상) 총 관객수 박스플롯",
     labels={"main_genre": "장르", "total_audi": "총 관객수"},
 )
@@ -180,4 +179,40 @@ with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
         "주요 장르 간 중앙값의 차이와 흥행 편차를 비교할 수 있으며, 일반적인 범위(상자 내부)를 크게 벗어나 기록적인 관객수를 달성한 흥행 이상치(Outlier) 영화를 식별할 수 있습니다."
+    )
+
+st.write("")  # 여백 추가
+
+# ----------------------------------------------------
+# 6. 개봉일 스크린수 vs 총 관객수 (첫 주 관객수 버블 차트)
+# ----------------------------------------------------
+st.subheader("6. 개봉일 스크린수, 총 관객수 및 첫 주 관객수의 관계 (버블 차트)")
+
+fig6 = px.scatter(
+    df,
+    x="first_scrn",
+    y="total_audi",
+    size="first_week_audi",
+    color="main_genre",
+    hover_name="movieNm",
+    size_max=40,
+    title="개봉일 스크린수 vs 총 관객수 (버블 크기: 개봉 첫 주 관객수)",
+    labels={
+        "first_scrn": "개봉일 스크린수",
+        "total_audi": "총 관객수",
+        "first_week_audi": "개봉 첫 주 관객수",
+        "main_genre": "장르",
+    },
+)
+
+fig6.update_traces(
+    hovertemplate="<b>%{hovertext}</b><br>개봉일 스크린수: %{x:,}개<br>총 관객수: %{y:,}명<br>첫 주 관객수: %{marker.size:,}명"
+)
+
+st.plotly_chart(fig6, use_container_width=True)
+
+with st.container():
+    st.markdown("### 💡 이 그래프로 알 수 있는 것")
+    st.write(
+        "개봉일 스크린수와 총 관객수 외에도 버블 크기를 통해 개봉 첫 주 초반 흥행 동력(초반 집객력)이 최종 관객수에 얼마나 영향을 미쳤는지 종합적으로 파악할 수 있습니다."
     )
