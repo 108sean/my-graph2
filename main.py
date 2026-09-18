@@ -224,7 +224,6 @@ st.write("")  # 여백 추가
 # ----------------------------------------------------
 st.subheader("7. 제작 국가 및 장르별 영화 편수 분포 (선버스트)")
 
-# 제작 국가 -> 장르 계층 집계
 df_sunburst = (
     df.groupby(["nation", "main_genre"], as_index=False)
     .size()
@@ -233,8 +232,8 @@ df_sunburst = (
 
 fig7 = px.sunburst(
     df_sunburst,
-    path=["nation", "main_genre"],  # 제작 국가 -> 장르
-    values="count",  # 칸 크기: 영화 편수
+    path=["nation", "main_genre"],
+    values="count",
     title="제작 국가 및 장르별 영화 편수 계층 구조",
     color="nation",
 )
@@ -249,4 +248,65 @@ with st.container():
     st.markdown("### 💡 이 그래프로 알 수 있는 것")
     st.write(
         "주요 제작 국가별 전체 영화 수 비중과 함께, 각 국가 내부에서 주로 제작·공급되는 주요 장르 구성을 동심원 구조로 쉽게 알 수 있습니다."
+    )
+
+st.write("")  # 여백 추가
+
+# ----------------------------------------------------
+# 8. 선택 변수 기반 10위권 머문 날수 산점도
+# ----------------------------------------------------
+st.subheader("8. 선택 지표 비교와 10위권 유지 기간(일수)의 관계")
+
+# 지표 선택 옵션 매핑
+column_options = {
+    "first_scrn": "개봉일 스크린수",
+    "total_audi": "총 관객수",
+    "first_show": "개봉일 상영횟수",
+    "first_week_audi": "개봉 첫 주 관객수",
+}
+
+col1, col2 = st.columns(2)
+with col1:
+    x_axis_key = st.selectbox(
+        "X축 지표 선택",
+        options=list(column_options.keys()),
+        format_func=lambda x: column_options[x],
+        index=0,  # 기본값: 개봉일 스크린수
+    )
+with col2:
+    y_axis_key = st.selectbox(
+        "Y축 지표 선택",
+        options=list(column_options.keys()),
+        format_func=lambda x: column_options[x],
+        index=1,  # 기본값: 총 관객수
+    )
+
+x_label = column_options[x_axis_key]
+y_label = column_options[y_axis_key]
+
+fig8 = px.scatter(
+    df,
+    x=x_axis_key,
+    y=y_axis_key,
+    color="days_in_top10",
+    hover_name="movieNm",
+    color_continuous_scale="Viridis",
+    title=f"{x_label} vs {y_label} (색상: 10위권 머문 날수)",
+    labels={
+        x_axis_key: x_label,
+        y_axis_key: y_label,
+        "days_in_top10": "10위권 머문 날수",
+    },
+)
+
+fig8.update_traces(
+    hovertemplate=f"<b>%{{hovertext}}</b><br>{x_label}: %{{x:,}}<br>{y_label}: %{{y:,}}<br>10위권 유지: %{{marker.color}}일"
+)
+
+st.plotly_chart(fig8, use_container_width=True)
+
+with st.container():
+    st.markdown("### 💡 이 그래프로 알 수 있는 것")
+    st.write(
+        f"**{x_label}**와 **{y_label}** 수치가 높을수록 10위권에 장기간(밝은 색상 점) 유지되는 경향이 있는지, 아니면 스크린 수나 초기 관객에 비해 단기간만 머물다 순위권에서 이탈했는지를 직관적으로 파악할 수 있습니다."
     )
